@@ -87,6 +87,6 @@ function isBlackSquareAt(coord) {
     return (coord % 8 + Math.floor(coord / 8)) % 2
 }
 
-
-
-
+function newGame() {
+    start();
+}
