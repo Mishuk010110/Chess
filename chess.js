@@ -75,7 +75,16 @@ function canMove(z) {
     console.log(fromInfo)
     console.log("to:")
     console.log(toInfo)
-    return cellIsEmpty;
+
+    switch (fromInfo.figure) {
+        case "P": return checkP(fromInfo, toInfo);
+        case "p": return checkp(fromInfo, toInfo);
+        default:
+            return cellIsEmpty;
+
+    }
+
+    
 }
 
 
@@ -91,15 +100,7 @@ function setDroppable() {
         }
     })
 
-    //$('.board').droppable({
-    //    drop: function (event, ui) {
-    //        var frCoord = ui.draggable.attr('id').substring(1)
-    //        var toCoord = this.id.substring(1)
-
-    //        moveFigure(frCoord, toCoord)
-    //    }
-    //})
-}
+ }
 
 function moveFigure(frCoord, toCoord) {
     console.log('move from' + frCoord + 'to' + toCoord)
@@ -159,4 +160,20 @@ function isBlackSquareAt(coord) {
 
 function newGame() {
     start();
+}
+
+
+function checkP(f, t) {
+    
+    if (t.h <= f.h) return false;
+    if (t.h === f.h + 1 && (t.v === f.v + 1 || t.v === f.v - 1) && ("rnbqkp".includes(t.figure))) return true;
+    if (t.v === f.v && (t.h === f.h + 1) && t.isEmpty) return true;
+    if (t.v === f.v && (t.h === f.h + 2) && f.h === 2 && t.isEmpty) return true;
+}
+function checkp(f, t) {
+
+    if (t.h >= f.h) return false;
+    if (t.h === f.h - 1 && (t.v === f.v + 1 || t.v === f.v - 1) && ("RNBQKP".includes(t.figure))) return true;
+    if (t.v === f.v && (t.h === f.h - 1) && t.isEmpty) return true;
+    if (t.v === f.v && (t.h === f.h - 2) && f.h === 7 && t.isEmpty) return true;
 }
