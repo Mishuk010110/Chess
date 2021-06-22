@@ -3,7 +3,7 @@ var divSquare = '<div id="s%coord" class="square %color"></div>'
 var divFigure = '<div id="f%coord" class="figure">$figure</div>'
 $(function () {
     start()
-    $('.buttonNew').click(newFiguresPHP)
+    //$('.buttonNew').click(newFiguresPHP)
        
     
     
@@ -17,11 +17,72 @@ function start() {
 
 
 function setDraggable() {
-    $('.figure').draggable()
+    $('.figure').draggable({
+        snap: '.square',
+        revert: 'invalid'
+    })
 }
- 
+
+function getV(coord) {
+    return (coord % 8) + 1;
+}
+
+function getH(coord) {
+    return 8-(coord - (coord % 8))/8;
+}
+
+function getCell(v, h) {
+    return v - 1 + (8 - h) * 8;
+}
+
+
+function canMove(z) {
+    var id = null;
+    var fr = null;
+    if (z && z.draggable && z.draggable.attr) {
+        id = z.draggable.attr('id');
+        fr = $(z.draggable);
+    } else {
+        if (z && z[0]) {
+            fr = $(z[0]);
+            id = z[0].id;
+        };
+    }
+
+    if (!id) return false;
+    var frCoord = id.substring(1)
+    var toCoord = this.id.substring(1)
+    var fromInfo = {
+        figure : map[frCoord],
+        h : getH(frCoord),
+        v: getV(frCoord),
+        coord: frCoord
+    }
+
+    if (!fromInfo.figure || fromInfo.figure === "1") return false;
+
+
+    var cell = map[toCoord];
+    var cellIsEmpty = !cell || cell === "1";
+    var toInfo = {
+        figure: cellIsEmpty?"1":cell,
+        h: getH(toCoord),
+        v: getV(toCoord),
+         coord: toCoord,
+        isEmpty: cellIsEmpty
+    }
+     console.log("from:")
+    console.log(fromInfo)
+    console.log("to:")
+    console.log(toInfo)
+    return cellIsEmpty;
+}
+
+
 function setDroppable() {
-    $('.square').droppable({
+    $('.square').droppable(
+        {
+        accept: canMove,
         drop:function (event, ui) {
             var frCoord = ui.draggable.attr('id').substring(1)
             var toCoord = this.id.substring(1)
@@ -29,6 +90,15 @@ function setDroppable() {
             moveFigure(frCoord, toCoord)
         }
     })
+
+    //$('.board').droppable({
+    //    drop: function (event, ui) {
+    //        var frCoord = ui.draggable.attr('id').substring(1)
+    //        var toCoord = this.id.substring(1)
+
+    //        moveFigure(frCoord, toCoord)
+    //    }
+    //})
 }
 
 function moveFigure(frCoord, toCoord) {
