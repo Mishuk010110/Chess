@@ -79,6 +79,12 @@ function canMove(z) {
     switch (fromInfo.figure) {
         case "P": return checkP(fromInfo, toInfo);
         case "p": return checkp(fromInfo, toInfo);
+        case "N": return checkN(fromInfo, toInfo);
+        case "n": return checkn(fromInfo, toInfo);
+        case "K": return checkK(fromInfo, toInfo);
+        case "k": return checkk(fromInfo, toInfo);
+
+
         default:
             return cellIsEmpty;
 
@@ -176,4 +182,68 @@ function checkp(f, t) {
     if (t.h === f.h - 1 && (t.v === f.v + 1 || t.v === f.v - 1) && ("RNBQKP".includes(t.figure))) return true;
     if (t.v === f.v && (t.h === f.h - 1) && t.isEmpty) return true;
     if (t.v === f.v && (t.h === f.h - 2) && f.h === 7 && t.isEmpty) return true;
+}
+function checkN(f, t) {
+    if ("RNBQKP".includes(t.figure)) return false;
+
+    var dh = t.h - f.h;
+    var dv = t.v - f.v;
+
+
+    if (dv===2 && dh===-1) return true;
+    if (dv===2 && dh===1) return true;
+    if (dv===-2 && dh===-1) return true;
+    if (dv===-2 && dh===1) return true;
+     if (dv===1 && dh===-2) return true;
+    if (dv===1 && dh===2) return true;
+    if (dv===-1 && dh===-2) return true;
+    if (dv===-1 && dh===2) return true;
+}
+function checkn(f, t) {
+    if ("rnbqkp".includes(t.figure)) return false;
+
+    var dh = t.h - f.h;
+    var dv = t.v - f.v;
+
+
+    if (dv===2 && dh===-1) return true;
+    if (dv===2 && dh===1) return true;
+    if (dv===-2 && dh===-1) return true;
+    if (dv===-2 && dh===1) return true;
+    if (dv===1 && dh===-2) return true;
+    if (dv===1 && dh===2) return true;
+    if (dv===-1 && dh===-2) return true;
+    if (dv===-1 && dh===2) return true;
+}
+function checkk(f, t) {
+    if ("rnbqkp".includes(t.figure)) return false;
+
+    var dh = t.h - f.h;
+    var dv = t.v - f.v;
+
+
+    if (dv===1 && dh===-1) return true;
+    if (dv===1 && dh===0) return true;
+    if (dv===1 && dh===1) return true;
+    if (dv===0 && dh===1) return true;
+    if (dv===0 && dh===-1) return true;
+    if (dv===-1 && dh===1) return true;
+    if (dv===-1 && dh===0) return true;
+    if (dv===-1 && dh===-1) return true;
+}
+function checkK(f, t) {
+    if ("RNBQKP".includes(t.figure)) return false;
+
+    var dh = t.h - f.h;
+    var dv = t.v - f.v;
+
+
+    if (dv===1 && dh===-1) return true;
+    if (dv===1 && dh===0) return true;
+    if (dv===1 && dh===1) return true;
+    if (dv===0 && dh===1) return true;
+    if (dv===0 && dh===-1) return true;
+    if (dv===-1 && dh===1) return true;
+    if (dv===-1 && dh===0) return true;
+    if (dv===-1 && dh===-1) return true;
 }
