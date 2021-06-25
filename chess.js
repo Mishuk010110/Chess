@@ -1,4 +1,5 @@
-var map
+
+var $engine = new ChessEngine();
 var divSquare = '<div id="s%coord" class="square %color"></div>'
 var divFigure = '<div id="f%coord" class="figure">$figure</div>'
 $(function () {
@@ -10,9 +11,9 @@ $(function () {
 });
 
 function start() {
-    map = new Array(64)
+    $engine.newGame();
     addSquares();
-    showFigures('rnbqkbnrpppppppp11111111111111111111111111111111PPPPPPPPRNBQKBNR')
+    showFigures($engine.position.map);
 }
 
 
@@ -23,17 +24,7 @@ function setDraggable() {
     })
 }
 
-function getV(coord) {
-    return (coord % 8) + 1;
-}
 
-function getH(coord) {
-    return 8 - (coord - (coord % 8)) / 8;
-}
-
-function getCell(v, h) {
-    return v - 1 + (8 - h) * 8;
-}
 
 
 function canMove(z) {
@@ -52,51 +43,8 @@ function canMove(z) {
     if (!id) return false;
     var frCoord = id.substring(1)
     var toCoord = this.id.substring(1)
-    var fromInfo = {
-        figure: map[frCoord],
-        h: getH(frCoord),
-        v: getV(frCoord),
-        coord: frCoord
-    }
 
-    if (!fromInfo.figure || fromInfo.figure === "1") return false;
-
-
-    var cell = map[toCoord];
-    var cellIsEmpty = !cell || cell === "1";
-    var toInfo = {
-        figure: cellIsEmpty ? "1" : cell,
-        h: getH(toCoord),
-        v: getV(toCoord),
-        coord: toCoord,
-        isEmpty: cellIsEmpty
-    }
-    console.log("from:")
-    console.log(fromInfo)
-    console.log("to:")
-    console.log(toInfo)
-
-    switch (fromInfo.figure) {
-        case "P": return checkP(fromInfo, toInfo);
-        case "p": return checkp(fromInfo, toInfo);
-        case "N": return checkN(fromInfo, toInfo);
-        case "n": return checkn(fromInfo, toInfo);
-        case "K": return checkK(fromInfo, toInfo);
-        case "k": return checkk(fromInfo, toInfo);
-        case "B": return checkB(fromInfo, toInfo);
-        case "b": return checkb(fromInfo, toInfo);
-        case "R": return checkR(fromInfo, toInfo);
-        case "r": return checkr(fromInfo, toInfo);
-        case "Q": return checkQ(fromInfo, toInfo);
-        case "q": return checkq(fromInfo, toInfo);
-
-
-        default:
-            return cellIsEmpty;
-
-    }
-
-
+    return $engine.check(frCoord, toCoord)
 }
 
 
@@ -116,9 +64,9 @@ function setDroppable() {
 
 function moveFigure(frCoord, toCoord) {
     console.log('move from' + frCoord + 'to' + toCoord)
-    figure = map[frCoord]
-    showFigureAt(frCoord, '1')
-    showFigureAt(toCoord, figure)
+    $engine.position.move(frCoord, toCoord)
+    showFigureAt(frCoord, $engine.position.map[frCoord])
+    showFigureAt(toCoord, $engine.position.map[toCoord])
 
 }
 
@@ -136,12 +84,11 @@ function addSquares() {
 
 function showFigures(figures) {
     for (var coord = 0; coord < 64; coord++)
-        showFigureAt(coord, figures.charAt(coord))
+        showFigureAt(coord, figures[coord])
 
 }
 
 function showFigureAt(coord, figure) {
-    map[coord] = figure
     $('#s' + coord).html(divFigure.replace('%coord', coord).replace('$figure', getChessSymbol(figure)))
     setDraggable()
 }
@@ -173,177 +120,3 @@ function isBlackSquareAt(coord) {
 function newGame() {
     start();
 }
-
-function getInfo(v, h) {
-    var coord = getCell(v, h);
-    return {
-        figure: map[coord],
-        h: h,
-        v: v,
-        coord: coord
-    }
-
-}
-
-function checkP(f, t) {
-
-    if (t.h <= f.h) return false;
-    if (t.h === f.h + 1 && (t.v === f.v + 1 || t.v === f.v - 1) && ("rnbqkp".includes(t.figure))) return true;
-    if (t.v === f.v && (t.h === f.h + 1) && t.isEmpty) return true;
-    if (t.v === f.v && (t.h === f.h + 2) && f.h === 2 && t.isEmpty && getInfo(f.v,3).figure === "1") return true;
-    
-}
-function checkp(f, t) {
-
-    if (t.h >= f.h) return false;
-    if (t.h === f.h - 1 && (t.v === f.v + 1 || t.v === f.v - 1) && ("RNBQKP".includes(t.figure))) return true;
-    if (t.v === f.v && (t.h === f.h - 1) && t.isEmpty) return true;
-    if (t.v === f.v && (t.h === f.h - 2) && f.h === 7 && t.isEmpty && getInfo(f.v, 6).figure === "1") return true;
-}
-function checkN(f, t) {
-    if ("RNBQKP".includes(t.figure)) return false;
-
-    var dh = t.h - f.h;
-    var dv = t.v - f.v;
-
-
-    if (dv === 2 && dh === -1) return true;
-    if (dv === 2 && dh === 1) return true;
-    if (dv === -2 && dh === -1) return true;
-    if (dv === -2 && dh === 1) return true;
-    if (dv === 1 && dh === -2) return true;
-    if (dv === 1 && dh === 2) return true;
-    if (dv === -1 && dh === -2) return true;
-    if (dv === -1 && dh === 2) return true;
-}
-function checkn(f, t) {
-    if ("rnbqkp".includes(t.figure)) return false;
-
-    var dh = t.h - f.h;
-    var dv = t.v - f.v;
-
-
-    if (dv === 2 && dh === -1) return true;
-    if (dv === 2 && dh === 1) return true;
-    if (dv === -2 && dh === -1) return true;
-    if (dv === -2 && dh === 1) return true;
-    if (dv === 1 && dh === -2) return true;
-    if (dv === 1 && dh === 2) return true;
-    if (dv === -1 && dh === -2) return true;
-    if (dv === -1 && dh === 2) return true;
-}
-function checkk(f, t) {
-    if ("rnbqkp".includes(t.figure)) return false;
-
-    var dh = t.h - f.h;
-    var dv = t.v - f.v;
-
-
-    if (dv === 1 && dh === -1) return true;
-    if (dv === 1 && dh === 0) return true;
-    if (dv === 1 && dh === 1) return true;
-    if (dv === 0 && dh === 1) return true;
-    if (dv === 0 && dh === -1) return true;
-    if (dv === -1 && dh === 1) return true;
-    if (dv === -1 && dh === 0) return true;
-    if (dv === -1 && dh === -1) return true;
-}
-function checkK(f, t) {
-    if ("RNBQKP".includes(t.figure)) return false;
-
-    var dh = t.h - f.h;
-    var dv = t.v - f.v;
-
-
-    if (dv === 1 && dh === -1) return true;
-    if (dv === 1 && dh === 0) return true;
-    if (dv === 1 && dh === 1) return true;
-    if (dv === 0 && dh === 1) return true;
-    if (dv === 0 && dh === -1) return true;
-    if (dv === -1 && dh === 1) return true;
-    if (dv === -1 && dh === 0) return true;
-    if (dv === -1 && dh === -1) return true;
-}
-
-
-
-
-function checkB(f, t) {
-    if ("RNBQKP".includes(t.figure)) return false;
-
-    var dh = t.h - f.h;
-    var dv = t.v - f.v;
-
-    if (Math.abs(dh) !== Math.abs(dv)) return false;
-    var hSign = (dh > 0) ? 1 : -1
-    var vSign = (dv > 0) ? 1 : -1;
-    for (var i = 1; i < Math.abs(dh); i++) {
-        var inf = getInfo(f.v + vSign * i, f.h + hSign * i);
-        if (inf.figure !== "1") return false;
-    }
-    return true;
-}
-function checkb(f, t) {
-    if ("rnbqkp".includes(t.figure)) return false;
-
-    var dh = t.h - f.h;
-    var dv = t.v - f.v;
-
-    if (Math.abs(dh) !== Math.abs(dv)) return false;
-    var hSign = (dh > 0) ? 1 : -1
-    var vSign = (dv > 0) ? 1 : -1;
-    for (var i = 1; i < Math.abs(dh); i++) {
-        var inf = getInfo(f.v + vSign * i, f.h + hSign * i);
-        if (inf.figure !== "1") return false;
-    }
-    return true;
-}
-function checkR(f, t) {
-    if ("RNBQKP".includes(t.figure)) return false;
-    if (!(t.h === f.h || t.v === f.v)) return false;
-
-    if (t.h === f.h) {
-        var dv = t.v - f.v;
-        var vSign = (dv > 0) ? 1 : -1;
-        for (var i = 1; i < Math.abs(dv); i++) {
-            var inf = getInfo(f.v + vSign * i, f.h);
-            if (inf.figure !== "1") return false;
-        }
-    } else {
-        var dh = t.h - f.h;
-        var hSign = (dh > 0) ? 1 : -1;
-        for (var i = 1; i < Math.abs(dh); i++) {
-            var inf = getInfo(f.v, f.h + hSign * i);
-            if (inf.figure !== "1") return false;
-        }
-    }
-    return true;
-}
-function checkr(f, t) {
-    if ("rnbqkp".includes(t.figure)) return false;
-    if (!(t.h === f.h || t.v === f.v)) return false;
-
-    if (t.h === f.h) {
-        var dv = t.v - f.v;
-        var vSign = (dv > 0) ? 1 : -1;
-        for (var i = 1; i < Math.abs(dv); i++) {
-            var inf = getInfo(f.v + vSign * i, f.h);
-            if (inf.figure !== "1") return false;
-        }
-    } else {
-        var dh = t.h - f.h;
-        var hSign = (dh > 0) ? 1 : -1;
-        for (var i = 1; i < Math.abs(dh); i++) {
-            var inf = getInfo(f.v, f.h + hSign * i);
-            if (inf.figure !== "1") return false;
-        }
-    }
-    return true;
-}
-function checkQ(f, t) {
-    return checkR(f, t) || checkB(f, t);
-}
-function checkq(f, t) {
-    return checkr(f, t) || checkb(f, t);
-}
-
