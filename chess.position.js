@@ -18,9 +18,16 @@ class ChessPosition {
     }
 
     move(fromCoord, toCoord) {
+      
         let f = this.map[fromCoord];
         this.map[fromCoord] = "1";
         this.map[toCoord] = f;
         this.who = (this.who === "w") ? "b" : "w";
+     
+    }
+
+    assign(p) {
+        this.setMapStr(p.getMapStr());
+        this.who = p.who;
     }
 }

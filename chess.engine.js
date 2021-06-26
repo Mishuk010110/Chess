@@ -31,7 +31,40 @@ class ChessEngine {
     check(fromCoord, toCoord) {
         let fromInfo = this.getInfo(fromCoord);
         let toInfo = this.getInfo(toCoord);
-        return this.checkMove(fromInfo, toInfo);
+
+        return this.#isCorrectFigure(fromCoord, this.position.who) && this.checkMove(fromInfo, toInfo) && this.checkPositionAfterMove(fromInfo, toInfo);
+    }
+
+    checkPositionAfterMove(fromInfo, toInfo) {
+        var tmpEngine = new ChessEngine();
+        tmpEngine.position.assign(this.position);
+        tmpEngine.position.move(fromInfo.coord, toInfo.coord);
+        if (this.position.who === "w")
+            return !tmpEngine.underAttackK();
+        else
+            return !tmpEngine.underAttackk();
+
+    }
+
+    underAttackK() {
+        var coord = this.#getFigurePos("K");
+        return this.fieldUnderAttack(coord, "b");
+    }
+
+    underAttackk() {
+        var coord = this.#getFigurePos("k");
+        return this.fieldUnderAttack(coord, "w");
+    }
+
+    fieldUnderAttack(coord, whoMove) {
+        let figures = (whoMove === "w") ? "RNBQKP" : "rnbqkp";
+
+        for (var i = 0; i < 64; i++) {
+            if (i !== coord && this.#isCorrectFigure(i, whoMove) && this.checkMove(this.getInfo(i), this.getInfo(coord)))
+                return true;
+        }
+
+        return false;
     }
 
     checkMove(fromInfo, toInfo) {
@@ -58,6 +91,17 @@ class ChessEngine {
     isBlackFigure(f) {
         if ("rnbqkp".includes(f)) return true;
         else return false;
+    }
+
+    #getFigurePos(f) {
+        for (var i = 0; i < 64; i++) {
+            if (this.position.map[i] === f) return i;
+        }
+    }
+
+    #isCorrectFigure(coord, whoMove) {
+        let figures = (whoMove === "w") ? "RNBQKP" : "rnbqkp";
+        return figures.includes(this.position.map[coord]);
     }
 
     #getV(coord) {
