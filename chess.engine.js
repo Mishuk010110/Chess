@@ -55,6 +55,10 @@ class ChessEngine {
 
         }
     }
+    isBlackFigure(f) {
+        if ("rnbqkp".includes(f)) return true;
+        else return false;
+    }
 
     #getV(coord) {
         return (coord % 8) + 1;

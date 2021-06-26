@@ -1,7 +1,7 @@
 
 var $engine = new ChessEngine();
 var divSquare = '<div id="s%coord" class="square %color"></div>'
-var divFigure = '<div id="f%coord" class="figure">$figure</div>'
+var divFigure = '<div id="f%coord" class="figure fig-%color">$figure</div>'
 $(function () {
     start()
     //$('.buttonNew').click(newFiguresPHP)
@@ -18,10 +18,25 @@ function start() {
 
 
 function setDraggable() {
-    $('.figure').draggable({
+    let disableClass = "fig-w";
+    let enableClass = "fig-b";
+    if ($engine.position.who === "w") {
+         disableClass = "fig-b";
+         enableClass = "fig-w";
+    }
+
+    $('.' + enableClass).draggable({
         snap: '.square',
         revert: 'invalid'
     })
+    $('.' + enableClass).draggable('enable')
+
+    $('.' + disableClass).draggable({
+        snap: '.square',
+        revert: 'invalid'
+    })
+
+    $('.' + disableClass).draggable('disable')
 }
 
 
@@ -67,7 +82,7 @@ function moveFigure(frCoord, toCoord) {
     $engine.position.move(frCoord, toCoord)
     showFigureAt(frCoord, $engine.position.map[frCoord])
     showFigureAt(toCoord, $engine.position.map[toCoord])
-
+    setDraggable()
 }
 
 
@@ -85,12 +100,14 @@ function addSquares() {
 function showFigures(figures) {
     for (var coord = 0; coord < 64; coord++)
         showFigureAt(coord, figures[coord])
-
+    setDraggable()
 }
 
 function showFigureAt(coord, figure) {
-    $('#s' + coord).html(divFigure.replace('%coord', coord).replace('$figure', getChessSymbol(figure)))
-    setDraggable()
+    let color = ($engine.isBlackFigure(figure)) ? "b" : "w";
+    let figureHtml = divFigure.replace('%coord', coord).replace('$figure', getChessSymbol(figure)).replace('%color',color);
+    $('#s' + coord).html(figureHtml)
+    
 }
 
 

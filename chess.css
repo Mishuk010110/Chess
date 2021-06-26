@@ -21,3 +21,7 @@
     font-size: 60px;
     cursor: pointer;
 }
+
+.ui-draggable-disabled{
+    cursor : default;
+}
