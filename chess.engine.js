@@ -1,13 +1,16 @@
+// двігло гри
 class ChessEngine {
 
     constructor() {
         this.position = new ChessPosition();
     }
 
+    // почати нову гру
     newGame() {
         this.position = new ChessPosition();
     }
 
+    // інформація про клітинку
     getInfoVH(v, h) {
         
         var coord = this.#getCell(v, h);
@@ -19,6 +22,7 @@ class ChessEngine {
         }
     }
 
+    // інформація про клітинку
     getInfo(coord) {
         return {
             figure: this.position.map[coord],
@@ -28,6 +32,7 @@ class ChessEngine {
         }
     }
 
+    // чи можливо зробти хід
     check(fromCoord, toCoord) {
         let fromInfo = this.getInfo(fromCoord);
         let toInfo = this.getInfo(toCoord);
@@ -35,6 +40,7 @@ class ChessEngine {
         return this.#isCorrectFigure(fromCoord, this.position.who) && this.checkMove(fromInfo, toInfo) && this.checkPositionAfterMove(fromInfo, toInfo);
     }
 
+    // перевірка що після ходу наш король буде в небезпеці
     checkPositionAfterMove(fromInfo, toInfo) {
         var tmpEngine = new ChessEngine();
         tmpEngine.position.assign(this.position);
@@ -46,16 +52,29 @@ class ChessEngine {
 
     }
 
+    // всі можливі ходи
+    getMovesFor(coord) {
+        let res = [];
+        for (var i = 0; i < 64; i++) {
+            if (coord !== i && this.check(coord, i))
+                res.push(i);
+        }
+        return res;
+    }
+
+    // чи є шах білому королю
     underAttackK() {
         var coord = this.#getFigurePos("K");
         return this.fieldUnderAttack(coord, "b");
     }
 
+    // чи є шах чорному королю
     underAttackk() {
         var coord = this.#getFigurePos("k");
         return this.fieldUnderAttack(coord, "w");
     }
 
+    // чи знаходиться клітинка під атакою
     fieldUnderAttack(coord, whoMove) {
         let figures = (whoMove === "w") ? "RNBQKP" : "rnbqkp";
 
@@ -67,6 +86,7 @@ class ChessEngine {
         return false;
     }
 
+    // перевірка чи можна зробити хід без врахування чи є атака на короля
     checkMove(fromInfo, toInfo) {
         switch (fromInfo.figure) {
             case "P": return this.#checkP(fromInfo, toInfo);
@@ -88,6 +108,8 @@ class ChessEngine {
 
         }
     }
+
+    // чи відноситься символ фігури до чорних
     isBlackFigure(f) {
         if ("rnbqkp".includes(f)) return true;
         else return false;

@@ -25,18 +25,32 @@ function setDraggable() {
          enableClass = "fig-w";
     }
 
-    $('.' + enableClass).draggable({
+    let options = {
         snap: '.square',
-        revert: 'invalid'
-    })
+        revert: 'invalid',
+        grid: [$('.square').width(), $('.square').height()],
+        containment: $('.board'),
+        start: function (event, ui) {
+            var coord = this.id.substring(1);
+            var eList = $engine.getMovesFor(coord);
+            $('.square').removeClass("can-move");
+            for (var i = 0; i < eList.length; i++) {
+                let id = "#s" + eList[i];
+                $( id).addClass("can-move")
+            }
+        },
+        stop: function () {
+            $('.square').removeClass("can-move");
+        }
+    }
+
+    $('.' + enableClass).draggable(options)
     $('.' + enableClass).draggable('enable')
 
-    $('.' + disableClass).draggable({
-        snap: '.square',
-        revert: 'invalid'
-    })
-
+    $('.' + disableClass).draggable(options)
     $('.' + disableClass).draggable('disable')
+
+
 }
 
 
