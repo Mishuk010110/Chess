@@ -31,7 +31,7 @@ function setDraggable() {
         grid: [$('.square').width(), $('.square').height()],
         containment: $('.board'),
         start: function (event, ui) {
-            var coord = this.id.substring(1);
+            var coord = +this.id.substring(1);
             var eList = $engine.getMovesFor(coord);
             $('.square').removeClass("can-move");
             for (var i = 0; i < eList.length; i++) {
@@ -70,8 +70,8 @@ function canMove(z) {
     }
 
     if (!id) return false;
-    var frCoord = id.substring(1)
-    var toCoord = this.id.substring(1)
+    var frCoord = +id.substring(1)
+    var toCoord = +this.id.substring(1)
 
     return $engine.check(frCoord, toCoord)
 }
@@ -82,8 +82,8 @@ function setDroppable() {
         {
             accept: canMove,
             drop: function (event, ui) {
-                var frCoord = ui.draggable.attr('id').substring(1)
-                var toCoord = this.id.substring(1)
+                var frCoord = +ui.draggable.attr('id').substring(1)
+                var toCoord = +this.id.substring(1)
 
                 moveFigure(frCoord, toCoord)
             }
@@ -93,9 +93,13 @@ function setDroppable() {
 
 function moveFigure(frCoord, toCoord) {
     console.log('move from' + frCoord + 'to' + toCoord)
-    $engine.position.move(frCoord, toCoord)
-    showFigureAt(frCoord, $engine.position.map[frCoord])
-    showFigureAt(toCoord, $engine.position.map[toCoord])
+    let changes = $engine.position.move(frCoord, toCoord);
+    for (var i = 0; i < changes.length; i++) {
+        let coord = changes[i];
+        showFigureAt(coord, $engine.position.map[coord])
+    }
+  
+  
     setDraggable()
 }
 
