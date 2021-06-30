@@ -101,9 +101,19 @@ function moveFigure(frCoord, toCoord) {
   
   
     setDraggable()
+    var hm = $engine.hasMoves();
+    var ic = $engine.isCheck();
+    if (ic) {
+        showAlert(hm ? "CHECK!" : "MATE!");
+    }
+    else {
+        if (!hm) showAlert("STALEMATE!");
+    }
 }
 
-
+function showAlert(s) {
+    alert(s);
+}
 
 
 function addSquares() {

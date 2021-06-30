@@ -32,6 +32,24 @@ class ChessEngine {
         }
     }
 
+    isCheck() {
+        if (this.position.who === "w") {
+            return this.underAttackK();
+        } else {
+            return this.underAttackk();
+        }
+    }
+
+
+
+    hasMoves() {
+        for (var i = 0; i < 63; i++) {
+            if (this.getMovesFor(i).length > 0)
+                return true;
+        }
+        return false;
+    }
+
     // קט למזכטגמ חנמבעט ץ³ה
     check(fromCoord, toCoord) {
         let fromInfo = this.getInfo(fromCoord);
